@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <table class="table">
+            <thead class="thead-dark text-center">
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Province</th>
+                </tr>
+            </thead>
+            <tbody id="data-row">
+                <tr>
+                    <td>{num}</td>
+                    <td>{name}</td>
+                    <td>{country}</td>
+                </tr>
+            </tbody>
+        </table>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="page-item"><a class="page-link" href="#" onclick="prevPage()">Previous</a></li>
+                <li class="page-item"><a class="page-link" href="#" onclick="page(this)" id="num-page">1</a></li>
+                <li class="page-item"><a class="page-link" href="#" onclick="page(this)" id="num-page">2</a></li>
+                <li class="page-item"><a class="page-link" href="#" onclick="page(this)" id="num-page">3</a></li>
+                <li class="page-item"><a class="page-link" href="#" onclick="nextPage()">Next</a></li>
+            </ul>
+        </nav>
+        <button class="btn btn-primary" id="btn-click">Click</button>
+    </div>
+</body>
+</html>
+<script>
+    $(function(){
+        //Template
+        var temp = $('#data-row').html();
+        $('#data-row').empty();
+        //Set data row per page
+        var dataRow = 2;
+        //nextPage btn
+        var nextPage;
+        window.nextPage = function(){
+            for(var i=0;i<$('[id*="num-page"]').length;i++){
+                $('[id="num-page"]:eq('+i+')').html(
+                    parseInt($('[id="num-page"]:eq('+i+')').html())+1
+                );
+            }
+        }
+        //PrevPage btn
+        var prevPage;
+        window.prevPage = function(){
+            if(parseInt($('[id="num-page"]:eq(0)').html()) > 1){
+                for(var i=0;i<$('[id*="num-page"]').length;i++){
+                    $('[id="num-page"]:eq('+i+')').html(
+                        parseInt($('[id="num-page"]:eq('+i+')').html())-1
+                    );
+                }
+            } 
+        }
+        //Page number btn
+        var page;
+        window.page = function(e){
+            $.post(
+                'data.php',
+                {
+                    test:"Hellow"
+                },
+                function(data,status){
+                    $('#data-row').empty();
+                    var data = JSON.parse(data);
+                    var page = parseInt($(e).html());
+                    for(i=(page-1)*dataRow;i<(page*dataRow);i++){
+                        if(data[i] !== undefined){
+                            var html = temp.replace(/{num}/g,i+1);
+                            html = html.replace(/{name}/g,data[i].name);
+                            html = html.replace(/{country}/g,data[i].country);
+                            $('#data-row').append(html);
+                        }
+                    }
+                }
+            );
+        }
+        //List data at first page load
+        $('#btn-click').click(function(){
+            $.post(
+                'data.php',
+                {
+                    test:"Hello"
+                },
+                function(data,status){
+                    var data = JSON.parse(data);
+                    $('#data-row').empty();
+                    for(i=0;i<dataRow;i++){
+                        var html = temp.replace(/{num}/g,i+1);
+                        html = html.replace(/{name}/g,data[i].name);
+                        html = html.replace(/{country}/g,data[i].country);
+                        $('#data-row').append(html);
+                    }
+                }
+            );
+        });
+    });
+</script>
