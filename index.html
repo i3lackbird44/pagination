@@ -55,6 +55,7 @@
         //nextPage btn
         var nextPage;
         window.nextPage = function(){
+            $('.pagination').find('.active').removeClass('active');
             for(var i=0;i<$('[id*="num-page"]').length;i++){
                 $('[id="num-page"]:eq('+i+')').html(
                     parseInt($('[id="num-page"]:eq('+i+')').html())+1
@@ -64,6 +65,7 @@
         //PrevPage btn
         var prevPage;
         window.prevPage = function(){
+            $('.pagination').find('.active').removeClass('active');
             if(parseInt($('[id="num-page"]:eq(0)').html()) > 1){
                 for(var i=0;i<$('[id*="num-page"]').length;i++){
                     $('[id="num-page"]:eq('+i+')').html(
@@ -75,6 +77,8 @@
         //Page number btn
         var page;
         window.page = function(e){
+            $(e).closest('.pagination').find('.active').removeClass('active');
+            $(e).closest('li').addClass("active");
             $.post(
                 'data.php',
                 {
