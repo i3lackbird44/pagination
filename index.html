@@ -47,6 +47,13 @@
 </html>
 <script>
     $(function(){
+        var res = $.post(
+                'data.php',
+                {
+                    test:"Hello"
+                }
+        );
+
         //Template
         var temp = $('#data-row').html();
         $('#data-row').empty();
@@ -57,9 +64,11 @@
         window.nextPage = function(){
             $('.pagination').find('.active').removeClass('active');
             for(var i=0;i<$('[id*="num-page"]').length;i++){
-                $('[id="num-page"]:eq('+i+')').html(
-                    parseInt($('[id="num-page"]:eq('+i+')').html())+1
-                );
+                if(parseInt($('[id="num-page"]:eq(2)').html())*dataRow < JSON.parse(res.responseText).length){
+                    $('[id="num-page"]:eq('+i+')').html(
+                        parseInt($('[id="num-page"]:eq('+i+')').html())+1
+                    );
+                }
             }
         }
         //PrevPage btn
@@ -79,44 +88,30 @@
         window.page = function(e){
             $(e).closest('.pagination').find('.active').removeClass('active');
             $(e).closest('li').addClass("active");
-            $.post(
-                'data.php',
-                {
-                    test:"Hellow"
-                },
-                function(data,status){
-                    $('#data-row').empty();
-                    var data = JSON.parse(data);
+            res.done(function(){
+                $('#data-row').empty();
+                var data = JSON.parse(res.responseText);
                     var page = parseInt($(e).html());
                     for(i=(page-1)*dataRow;i<(page*dataRow);i++){
-                        if(data[i] !== undefined){
-                            var html = temp.replace(/{num}/g,i+1);
-                            html = html.replace(/{name}/g,data[i].name);
-                            html = html.replace(/{country}/g,data[i].country);
-                            $('#data-row').append(html);
-                        }
-                    }
-                }
-            );
-        }
-        //List data at first page load
-        $('#btn-click').click(function(){
-            $.post(
-                'data.php',
-                {
-                    test:"Hello"
-                },
-                function(data,status){
-                    var data = JSON.parse(data);
-                    $('#data-row').empty();
-                    for(i=0;i<dataRow;i++){
                         var html = temp.replace(/{num}/g,i+1);
                         html = html.replace(/{name}/g,data[i].name);
                         html = html.replace(/{country}/g,data[i].country);
                         $('#data-row').append(html);
                     }
+            });
+        }
+        //List data at first page load
+        $('#btn-click').click(function(){
+            res.done(function(){
+                $('#data-row').empty();
+                var data = JSON.parse(res.responseText);
+                for(i=0;i<dataRow;i++){
+                    var html = temp.replace(/{num}/g,i+1);
+                    html = html.replace(/{name}/g,data[i].name);
+                    html = html.replace(/{country}/g,data[i].country);
+                    $('#data-row').append(html);
                 }
-            );
+            });
         });
     });
 </script>
